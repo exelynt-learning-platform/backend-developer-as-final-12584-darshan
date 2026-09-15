@@ -16,10 +16,19 @@ A RESTful backend API for managing bookable resources (rooms, vehicles, equipmen
 - [API Documentation](#api-documentation)
 - [API Endpoints](#api-endpoints)
 - [Filtering, Pagination and Sorting](#filtering-pagination-and-sorting)
+- [Reservation Status](#reservation-status)
+- [Reservation Price Calculation](#reservation-price-calculation)
+- [Authorization](#authorization)
+- [Validation](#validation)
 - [Error Responses](#error-responses)
+- [Security](#security)
 - [Running Tests](#running-tests)
+- [Test Coverage](#test-coverage)
+- [Security Test Scenarios](#security-test-scenarios)
 - [Project Structure](#project-structure)
+- [Application Endpoints Summary](#application-endpoints-summary)
 - [Security Notes](#security-notes)
+- [License](#license)
 
 ---
 
@@ -42,7 +51,7 @@ A RESTful backend API for managing bookable resources (rooms, vehicles, equipmen
 - USER can cancel their own reservations
 - Global exception handling
 - Custom `401 Unauthorized` and `403 Forbidden` responses
-- 43 unit and integration tests focused on security and authorization
+- 51 unit and integration tests focused on security and authorization
 
 ---
 
@@ -615,7 +624,7 @@ Tests use an in-memory H2 database and do not require MySQL.
 ### Current Test Result
 
 ```text
-Tests run: 43
+Tests run: 51
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -631,9 +640,14 @@ The test suite covers:
 - Authentication and login
 - User registration
 - JWT security
+- Real JWT authentication integration
+- Malformed JWT rejection
+- Tampered JWT rejection
+- BCrypt password hashing verification
 - ADMIN authorization
 - USER authorization
 - Resource RBAC
+- Resource CRUD authorization for ADMIN and USER
 - Reservation ownership
 - Reservation cancellation
 - Reservation confirmation
@@ -656,6 +670,8 @@ The application verifies scenarios including:
 - Valid JWT authentication → `200`
 - Missing JWT → `401 Unauthorized`
 - Invalid JWT → `401 Unauthorized`
+- Malformed JWT → `401 Unauthorized`
+- Tampered JWT → `401 Unauthorized`
 - USER accessing another user's reservation → `403 Forbidden`
 - USER attempting resource creation → `403 Forbidden`
 - USER attempting resource update → `403 Forbidden`
@@ -666,6 +682,12 @@ The application verifies scenarios including:
 - USER accessing own reservations → `200`
 - Invalid reservation request → `400 Bad Request`
 - Past reservation start time → `400 Bad Request`
+- ADMIN updating a resource → `200`
+- ADMIN deleting a resource → `204`
+- USER attempting resource update → `403 Forbidden`
+- USER attempting resource deletion → `403 Forbidden`
+- BCrypt correctly matches valid passwords
+- BCrypt rejects incorrect passwords
 
 ---
 
