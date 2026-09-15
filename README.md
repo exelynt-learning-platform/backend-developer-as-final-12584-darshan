@@ -36,7 +36,7 @@ Users can register their own accounts, while ADMIN accounts are controlled by th
 - Automatic database table creation using Hibernate
 - Swagger/OpenAPI documentation
 - Seeded ADMIN and USER accounts
-- Automated security, controller, and service tests
+- Automated security, controller, service, and validation tests
 
 ---
 
@@ -96,16 +96,16 @@ The application supports environment variables for database and JWT configuratio
 | `DB_URL` | MySQL database URL | `jdbc:mysql://localhost:3306/resource_booking_db` |
 | `DB_USERNAME` | MySQL username | `root` |
 | `DB_PASSWORD` | MySQL password | Configure according to your local MySQL setup |
-| `JWT_SECRET` | Secret key used to sign JWTs | Application default |
+| `JWT_SECRET` | Secret key used to sign JWTs | Must be configured |
 | `JWT_EXPIRATION` | JWT expiration time in milliseconds | `86400000` |
 
-For production environments, it is recommended to provide these values through environment variables instead of storing credentials directly in configuration files.
+For production environments, provide these values through environment variables instead of storing credentials directly in configuration files.
 
 ---
 
 ## How to Run
 
-### 1. Open the project
+### 1. Open the Project
 
 Open the project in IntelliJ IDEA or another Java IDE.
 
@@ -113,17 +113,17 @@ Open the project in IntelliJ IDEA or another Java IDE.
 
 Make sure MySQL is running.
 
-### 3. Create the database
+### 3. Create the Database
 
 ```sql
 CREATE DATABASE resource_booking_db;
 ```
 
-### 4. Configure database credentials
+### 4. Configure Database Credentials
 
-Update the environment variables or application configuration according to your local MySQL setup.
+Configure the required environment variables according to your local MySQL setup.
 
-### 5. Run the application
+### 5. Run the Application
 
 #### Windows
 
@@ -145,7 +145,7 @@ http://localhost:8080
 
 ---
 
-## Swagger / OpenAPI
+# Swagger / OpenAPI
 
 Swagger UI is available at:
 
@@ -246,6 +246,8 @@ Password: user123
 Role: USER
 ```
 
+> These credentials are intended for local development and testing. Change them for production use.
+
 ---
 
 # Authorization and Roles
@@ -301,6 +303,36 @@ USER users cannot:
 | `POST` | `/resources` | ADMIN |
 | `PUT` | `/resources/{id}` | ADMIN |
 | `DELETE` | `/resources/{id}` | ADMIN |
+
+---
+
+## Resource Pagination
+
+The `GET /resources` API supports pagination using:
+
+- `page`
+- `size`
+
+### Example
+
+```http
+GET /resources?page=0&size=10
+```
+
+`page` is zero-based.
+
+```text
+page=0 → first page
+page=1 → second page
+```
+
+Optional sorting is also supported:
+
+```http
+GET /resources?page=0&size=10&sort=name,asc
+```
+
+Multiple sorting criteria can also be provided.
 
 ---
 
@@ -466,6 +498,7 @@ Common responses include:
 401 Unauthorized
 403 Forbidden
 404 Not Found
+500 Internal Server Error
 ```
 
 Custom JSON error responses are provided for authentication and authorization failures.
@@ -523,7 +556,20 @@ src
 
 # Testing
 
-The project contains automated tests covering authentication, authorization, validation, services, controllers, and security scenarios.
+The project contains automated tests covering:
+
+- Authentication
+- Authorization
+- Role-based access control
+- Resource controller
+- Resource security
+- Reservation controller
+- Reservation security
+- Reservation ownership
+- Reservation validation
+- Authentication registration
+- Service layer
+- Exception handling
 
 Run all tests using:
 
@@ -542,7 +588,7 @@ Run all tests using:
 ### Current Test Result
 
 ```text
-Tests run: 39
+Tests run: 43
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -560,10 +606,14 @@ The application has been manually verified for the following scenarios:
 - Invalid JWT → `401 Unauthorized`
 - USER accessing another user's reservation → `403 Forbidden`
 - USER attempting resource creation → `403 Forbidden`
+- USER attempting resource update → `403 Forbidden`
+- USER attempting resource deletion → `403 Forbidden`
 - USER attempting reservation update → `403 Forbidden`
 - USER attempting reservation deletion → `403 Forbidden`
 - ADMIN accessing all reservations → `200`
 - USER accessing own reservations → `200`
+- Invalid reservation request → `400 Bad Request`
+- Past reservation start time → `400 Bad Request`
 
 ---
 

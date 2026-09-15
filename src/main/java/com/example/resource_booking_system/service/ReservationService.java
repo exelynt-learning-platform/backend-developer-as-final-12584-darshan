@@ -7,10 +7,7 @@ import com.example.resource_booking_system.entity.Reservation;
 import com.example.resource_booking_system.entity.Resource;
 import com.example.resource_booking_system.entity.User;
 import com.example.resource_booking_system.enums.ReservationStatus;
-import com.example.resource_booking_system.exception.BadRequestException;
-import com.example.resource_booking_system.exception.ForbiddenException;
-import com.example.resource_booking_system.exception.ReservationNotFoundException;
-import com.example.resource_booking_system.exception.ResourceNotFoundException;
+import com.example.resource_booking_system.exception.*;
 import com.example.resource_booking_system.repository.ReservationRepository;
 import com.example.resource_booking_system.repository.ReservationSpecification;
 import com.example.resource_booking_system.repository.ResourceRepository;
@@ -54,7 +51,7 @@ public class ReservationService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new UserNotFoundException(
                                 "User not found: " + username
                         )
                 );
@@ -114,7 +111,7 @@ public class ReservationService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new UserNotFoundException(
                                 "User not found: " + username
                         )
                 );
@@ -198,7 +195,7 @@ public class ReservationService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new UserNotFoundException(
                                 "User not found: " + username
                         )
                 );
@@ -292,7 +289,7 @@ public class ReservationService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new UserNotFoundException(
                                 "User not found: " + username
                         )
                 );
@@ -352,7 +349,7 @@ public class ReservationService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new UserNotFoundException(
                                 "User not found: " + username
                         )
                 );

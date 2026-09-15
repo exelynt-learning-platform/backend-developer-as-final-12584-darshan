@@ -6,6 +6,8 @@ import com.example.resource_booking_system.entity.Resource;
 import com.example.resource_booking_system.exception.ResourceNotFoundException;
 import com.example.resource_booking_system.repository.ResourceRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,12 +22,10 @@ public class ResourceService {
     }
 
     // Get all resources
-    public List<ResourceResponse> getAllResources() {
+    public Page<ResourceResponse> getAllResources(Pageable pageable) {
 
-        return resourceRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        return resourceRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     // Get resource by ID

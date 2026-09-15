@@ -4,6 +4,7 @@ import com.example.resource_booking_system.entity.Reservation;
 import com.example.resource_booking_system.entity.Resource;
 import com.example.resource_booking_system.entity.User;
 import com.example.resource_booking_system.enums.Role;
+import com.example.resource_booking_system.exception.ForbiddenException;
 import com.example.resource_booking_system.repository.ReservationRepository;
 import com.example.resource_booking_system.repository.UserRepository;
 import com.example.resource_booking_system.service.ReservationService;
@@ -173,7 +174,7 @@ class ReservationOwnershipTest {
 
         // Other user must be rejected
         assertThrows(
-                RuntimeException.class,
+                ForbiddenException.class,
                 () -> reservationService.getReservationById(
                         100L,
                         "other"

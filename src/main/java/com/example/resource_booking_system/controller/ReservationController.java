@@ -6,6 +6,11 @@ import com.example.resource_booking_system.dto.reservation.ReservationUpdateRequ
 import com.example.resource_booking_system.enums.ReservationStatus;
 import com.example.resource_booking_system.service.ReservationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -23,8 +28,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+
 @RestController
 @RequestMapping("/reservations")
+@Tag(
+        name = "Reservations",
+        description = "Reservation management APIs"
+)
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -42,6 +52,24 @@ public class ReservationController {
     // ==========================================
 
     @PostMapping
+    @Operation(
+            summary = "Create reservation",
+            description = "Creates a reservation for the authenticated user"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Reservation created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid reservation data"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            )
+    })
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody ReservationRequest request,
             Authentication authentication) {
@@ -66,6 +94,20 @@ public class ReservationController {
     // ==========================================
 
     @GetMapping
+    @Operation(
+            summary = "Get my reservations",
+            description = "Returns paginated reservations belonging to the authenticated user"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservations retrieved successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            )
+    })
     public ResponseEntity<Page<ReservationResponse>> getMyReservations(
             Authentication authentication,
 
@@ -102,6 +144,20 @@ public class ReservationController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(
+            summary = "Get all reservations",
+            description = "Returns all reservations with optional filtering and pagination. ADMIN only."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservations retrieved successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied. ADMIN role required."
+            )
+    })
     public ResponseEntity<Page<ReservationResponse>> getAllReservations(
 
             @RequestParam(required = false)
@@ -133,6 +189,24 @@ public class ReservationController {
     // ==========================================
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get reservation by ID",
+            description = "Returns a reservation accessible to the authenticated user"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservation retrieved successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reservation not found"
+            )
+    })
     public ResponseEntity<ReservationResponse> getReservationById(
             @PathVariable Long id,
             Authentication authentication) {
@@ -156,6 +230,28 @@ public class ReservationController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(
+            summary = "Update reservation",
+            description = "Updates an existing reservation. ADMIN only."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservation updated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid reservation data"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied. ADMIN role required."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reservation not found"
+            )
+    })
     public ResponseEntity<ReservationResponse> updateReservation(
             @PathVariable Long id,
             @Valid @RequestBody ReservationUpdateRequest request) {
@@ -176,6 +272,24 @@ public class ReservationController {
     // ==========================================
 
     @PutMapping("/{id}/cancel")
+    @Operation(
+            summary = "Cancel reservation",
+            description = "Cancels a reservation belonging to the authenticated user"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservation cancelled successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reservation not found"
+            )
+    })
     public ResponseEntity<ReservationResponse> cancelReservation(
             @PathVariable Long id,
             Authentication authentication) {
@@ -198,6 +312,24 @@ public class ReservationController {
     // ==========================================
 
     @PutMapping("/{id}/confirm")
+    @Operation(
+            summary = "Confirm reservation",
+            description = "Confirms a reservation belonging to the authenticated user"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservation confirmed successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reservation not found"
+            )
+    })
     public ResponseEntity<ReservationResponse> confirmReservation(
             @PathVariable Long id,
             Authentication authentication) {
@@ -221,6 +353,24 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(
+            summary = "Delete reservation",
+            description = "Deletes a reservation. ADMIN only."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Reservation deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied. ADMIN role required."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reservation not found"
+            )
+    })
     public ResponseEntity<Void> deleteReservation(
             @PathVariable Long id) {
 

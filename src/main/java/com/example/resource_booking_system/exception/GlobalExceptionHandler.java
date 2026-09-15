@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import com.example.resource_booking_system.exception.UserNotFoundException;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -170,6 +173,73 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(
                 HttpStatus.FORBIDDEN,
                 exception.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    // ==========================================
+    // 404 - USER NOT FOUND
+    // ==========================================
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(
+            UserNotFoundException exception,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+
+    // ==========================================
+    // 400 - MALFORMED JSON / INVALID ENUM
+    // ==========================================
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadableMessage(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Malformed request body or invalid field value",
+                request.getRequestURI()
+        );
+    }
+
+
+    // ==========================================
+    // 400 - INVALID PARAMETER TYPE
+    // ==========================================
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(
+            MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid value for parameter: " + exception.getName(),
+                request.getRequestURI()
+        );
+    }
+
+
+    // ==========================================
+    // 500 - CATCH ALL
+    // ==========================================
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(
+            Exception exception,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred",
                 request.getRequestURI()
         );
     }

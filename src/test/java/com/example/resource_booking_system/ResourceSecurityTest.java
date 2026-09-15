@@ -60,8 +60,9 @@ class ResourceSecurityTest {
     @Test
     void testUserCanReadResources() {
 
-        var resources =
-                resourceService.getAllResources();
+        var resources = resourceService.getAllResources(
+                org.springframework.data.domain.PageRequest.of(0, 10)
+        );
 
         assertNotNull(resources);
     }

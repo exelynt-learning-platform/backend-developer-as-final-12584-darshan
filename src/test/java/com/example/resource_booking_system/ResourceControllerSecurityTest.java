@@ -4,10 +4,11 @@ import com.example.resource_booking_system.dto.resource.ResourceResponse;
 import com.example.resource_booking_system.service.ResourceService;
 
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,12 +18,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -49,8 +47,14 @@ class ResourceControllerSecurityTest {
     )
     void userCanGetResources() throws Exception {
 
-        when(resourceService.getAllResources())
-                .thenReturn(List.of());
+        when(resourceService.getAllResources(any()))
+                .thenReturn(
+                        new PageImpl<>(
+                                List.of(),
+                                PageRequest.of(0, 10),
+                                0
+                        )
+                );
 
         mockMvc.perform(
                         get("/resources")

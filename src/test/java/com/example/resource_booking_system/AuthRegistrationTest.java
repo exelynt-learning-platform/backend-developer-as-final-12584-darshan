@@ -4,19 +4,21 @@ import com.example.resource_booking_system.dto.auth.RegisterRequest;
 import com.example.resource_booking_system.entity.User;
 import com.example.resource_booking_system.enums.Role;
 import com.example.resource_booking_system.repository.UserRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class AuthRegistrationTest {
@@ -38,8 +40,10 @@ class AuthRegistrationTest {
 
     private RegisterRequest request;
 
+
     @BeforeEach
     void setUp() {
+
         request = new RegisterRequest(
                 "darshan",
                 "darshan@example.com",
@@ -47,37 +51,49 @@ class AuthRegistrationTest {
         );
     }
 
+
+    // ==========================================
+    // TEST 1:
+    // REGISTER NEW USER
+    // ==========================================
+
     @Test
     void shouldRegisterNewUser() {
 
-        when(userRepository.findByUsername("darshan"))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("darshan"))
+                .thenReturn(false);
 
-        when(userRepository.findByEmail("darshan@example.com"))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsByEmail("darshan@example.com"))
+                .thenReturn(false);
 
         when(passwordEncoder.encode("darshan123"))
                 .thenReturn("encodedPassword");
 
         when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0)
+                );
 
         authService.register(request);
 
-        verify(userRepository).save(any(User.class));
+        verify(userRepository)
+                .save(any(User.class));
 
         verify(passwordEncoder)
                 .encode("darshan123");
     }
 
+
+    // ==========================================
+    // TEST 2:
+    // DUPLICATE USERNAME
+    // ==========================================
+
     @Test
     void shouldRejectDuplicateUsername() {
 
-        User existingUser = new User();
-        existingUser.setUsername("darshan");
-
-        when(userRepository.findByUsername("darshan"))
-                .thenReturn(Optional.of(existingUser));
+        when(userRepository.existsByUsername("darshan"))
+                .thenReturn(true);
 
         RuntimeException exception = assertThrows(
                 RuntimeException.class,
@@ -93,17 +109,20 @@ class AuthRegistrationTest {
                 .save(any(User.class));
     }
 
+
+    // ==========================================
+    // TEST 3:
+    // DUPLICATE EMAIL
+    // ==========================================
+
     @Test
     void shouldRejectDuplicateEmail() {
 
-        when(userRepository.findByUsername("darshan"))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("darshan"))
+                .thenReturn(false);
 
-        User existingUser = new User();
-        existingUser.setEmail("darshan@example.com");
-
-        when(userRepository.findByEmail("darshan@example.com"))
-                .thenReturn(Optional.of(existingUser));
+        when(userRepository.existsByEmail("darshan@example.com"))
+                .thenReturn(true);
 
         RuntimeException exception = assertThrows(
                 RuntimeException.class,
@@ -119,20 +138,28 @@ class AuthRegistrationTest {
                 .save(any(User.class));
     }
 
+
+    // ==========================================
+    // TEST 4:
+    // NEW USER ALWAYS GETS USER ROLE
+    // ==========================================
+
     @Test
     void newlyRegisteredUserShouldAlwaysHaveUserRole() {
 
-        when(userRepository.findByUsername("darshan"))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsByUsername("darshan"))
+                .thenReturn(false);
 
-        when(userRepository.findByEmail("darshan@example.com"))
-                .thenReturn(Optional.empty());
+        when(userRepository.existsByEmail("darshan@example.com"))
+                .thenReturn(false);
 
         when(passwordEncoder.encode("darshan123"))
                 .thenReturn("encodedPassword");
 
         when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0)
+                );
 
         authService.register(request);
 
