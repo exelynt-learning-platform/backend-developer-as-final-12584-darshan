@@ -303,7 +303,9 @@ public class ReservationService {
                                 )
                         );
 
-        if (!reservation.getUser()
+        // USER can confirm only their own; ADMIN can confirm any
+        if (user.getRole().name().equals("USER")
+                && !reservation.getUser()
                 .getId()
                 .equals(user.getId())) {
 
